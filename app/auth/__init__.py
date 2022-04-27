@@ -1,7 +1,7 @@
-from flask import Blueprint, render_template, redirect, url_for, flash,current_app
+from flask import Blueprint, render_template, redirect, url_for, flash, current_app
 from flask_login import login_user, login_required, logout_user, current_user
+from sqlalchemy.sql.functions import user
 from werkzeug.security import generate_password_hash
-
 from app.auth.decorators import admin_required
 from app.auth.forms import login_form, register_form, profile_form, security_form, user_edit_form
 from app.db import db
@@ -26,9 +26,11 @@ def register():
                 db.session.add(user)
                 db.session.commit()
             flash('Congratulations, you are now a registered user!', "success")
+            current_app.logger.info("New user " + user.email + " registered")
             return redirect(url_for('auth.login'), 302)
         else:
             flash('Already Registered')
+            current_app.logger.error(user.email + " Already registered")
             return redirect(url_for('auth.login'), 302)
     return render_template('register.html', form=form)
 
@@ -41,6 +43,7 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
         if user is None or not user.check_password(form.password.data):
             flash('Invalid username or password')
+            #current_app.logger.warning(user.email + " Invalid username or password")
             return redirect(url_for('auth.login'))
         else:
             user.authenticated = True
@@ -48,8 +51,10 @@ def login():
             db.session.commit()
             login_user(user)
             flash("Welcome", 'success')
+            current_app.logger.info(user.email + " User Login")
             return redirect(url_for('auth.dashboard'))
     return render_template('login.html', form=form)
+
 
 @auth.route("/logout")
 @login_required
@@ -60,8 +65,8 @@ def logout():
     db.session.add(user)
     db.session.commit()
     logout_user()
+    #current_app.logger.info(user.email + " User Login")
     return redirect(url_for('auth.login'))
-
 
 
 @auth.route('/dashboard')
@@ -79,6 +84,7 @@ def edit_profile():
         db.session.add(current_user)
         db.session.commit()
         flash('You Successfully Updated your Profile', 'success')
+        current_app.logger.info(user.email + " Profile updated")
         return redirect(url_for('auth.dashboard'))
     return render_template('profile_edit.html', form=form)
 
@@ -93,6 +99,7 @@ def edit_account():
         db.session.add(current_user)
         db.session.commit()
         flash('You Successfully Updated your Password or Email', 'success')
+        current_app.logger.info(user.email + " Password or email updated")
         return redirect(url_for('auth.dashboard'))
     return render_template('manage_account.html', form=form)
 
@@ -110,9 +117,7 @@ def browse_users():
     edit_url = ('auth.edit_user', [('user_id', ':id')])
     add_url = url_for('auth.add_user')
     delete_url = ('auth.delete_user', [('user_id', ':id')])
-
-    current_app.logger.info("Browse page loading")
-
+    #current_app.logger.info(user.email + " Browse page loading")
     return render_template('browse.html', titles=titles, add_url=add_url, edit_url=edit_url, delete_url=delete_url,
                            retrieve_url=retrieve_url, data=data, User=User, record_type="Users")
 
@@ -135,7 +140,7 @@ def edit_user(user_id):
         db.session.add(user)
         db.session.commit()
         flash('User Edited Successfully', 'success')
-        current_app.logger.info("edited a user")
+        current_app.logger.info(user.email + " Edited a user")
         return redirect(url_for('auth.browse_users'))
     return render_template('user_edit.html', form=form)
 
@@ -151,6 +156,7 @@ def add_user():
             db.session.add(user)
             db.session.commit()
             flash('Congratulations, you just created a user', 'success')
+            current_app.logger.info(user.email + " Created a user")
             return redirect(url_for('auth.browse_users'))
         else:
             flash('Already Registered')
@@ -169,8 +175,3 @@ def delete_user(user_id):
     db.session.commit()
     flash('User Deleted', 'success')
     return redirect(url_for('auth.browse_users'), 302)
-
-
-
-
-
