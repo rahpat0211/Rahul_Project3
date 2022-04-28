@@ -15,9 +15,9 @@ def test_adding_user(application):
         #add it to get ready to be committed
         db.session.add(user)
         #call the commit
-        #db.session.commit()
+        db.session.commit()
         #assert that we now have a new user
-        #assert db.session.query(User).count() == 1
+        assert db.session.query(User).count() == 1
         #finding one user record by email
         user = User.query.filter_by(email='keith@webizly.com').first()
         log.info(user)
@@ -40,6 +40,52 @@ def test_adding_user(application):
         db.session.delete(user)
         assert db.session.query(User).count() == 0
         assert db.session.query(Song).count() == 0
+
+def test_register(client):
+    """ POST to /register """
+    new_email = 'newuser@test.test'
+    new_password = 'Test1234!'
+    data = {
+        'email' : new_email,
+        'password' : new_password,
+        'confirm' : new_password
+    }
+    resp = client.post('register', data=data)
+
+    assert resp.status_code == 302
+
+    # verify new user is in database
+    new_user = User.query.filter_by(email=new_email).first()
+    assert new_user.email == new_email
+
+    db.session.delete(new_user) # pylint: disable=no-member
+
+def test_login(client):
+    """This will test the login function"""
+    assert db.session.query(User).count() == 0
+
+    # create a new user in the database
+    user = User("newuser@test.test", "Test1234!")
+    db.session.add(user)
+    db.session.commit()
+    assert db.session.query(User).count() == 1
+    assert user.is_authenticated() is True
+    user = User.query.filter_by(email='newuser@test.test').first()
+    assert user.email == 'newuser@test.test'
+
+    data = {
+        'email': user.email,
+        'password': user.password
+    }
+    response = client.post('/login', data=data)
+    assert response.status_code == 302
+
+    # verify new user is active
+    assert user.active is True
+
+def logout(client):
+    return client.get('/logout', follow_redirects=True)
+
 
 
 

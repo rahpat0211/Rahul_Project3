@@ -22,6 +22,7 @@ def application():
 
     with application.app_context():
         db.create_all()
+        application.config['WTF_CSRF_ENABLED'] = False
         yield application
         db.session.remove()
         #drops the database tables after the test runs

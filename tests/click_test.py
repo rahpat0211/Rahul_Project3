@@ -18,3 +18,19 @@ def test_create_database():
     dbdir = os.path.join(root, '../database')
     # make a directory if it doesn't exist
     assert os.path.exists(dbdir) == True
+
+#Test to check if user uploaded music.csv
+
+import pytest
+import unittest
+
+class CSV_Test(unittest.TestCase):
+    @pytest.fixture(autouse=True)
+    def initdir(self, tmpdir):
+        tmpdir.chdir()
+        tmpdir.join("music.csv").write("# testdata")
+
+    def test_method(self):
+        with open("music.csv") as f:
+            s = f.read()
+        assert "testdata" in s

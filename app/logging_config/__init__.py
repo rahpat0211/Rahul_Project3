@@ -18,6 +18,8 @@ log_con = flask.Blueprint('log_con', __name__)
 def before_request_logging():
     current_app.logger.info(user.email)
 
+
+@log_con.before_app_request
 def CSV_file_upload():
     log=logging.getLogger("myCSVuploads")
     log.info("New CSV uploaded")
@@ -31,6 +33,7 @@ def after_request_logging(response):
     elif request.path.startswith('/bootstrap'):
         return response
     return response
+
 
 
 
