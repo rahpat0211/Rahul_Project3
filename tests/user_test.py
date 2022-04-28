@@ -80,6 +80,9 @@ def test_login(client):
     response = client.post('/login', data=data)
     assert response.status_code == 302
 
+    # verify new user is active
+    assert user.active is True
+
 
 
 
