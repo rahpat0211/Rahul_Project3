@@ -83,6 +83,9 @@ def test_login(client):
     # verify new user is active
     assert user.active is True
 
+def logout(client):
+    return client.get('/logout', follow_redirects=True)
+
 
 
 
