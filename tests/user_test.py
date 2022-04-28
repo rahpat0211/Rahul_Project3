@@ -41,16 +41,39 @@ def test_adding_user(application):
         assert db.session.query(User).count() == 0
         assert db.session.query(Song).count() == 0
 
-import sqlite3 as sql
+def test_register(client):
+    """ POST to /register """
+    new_email = 'newuser@test.test'
+    new_password = 'Test1234!'
+    data = {
+        'email' : new_email,
+        'password' : new_password,
+        'confirm' : new_password
+    }
+    resp = client.post('register', data=data)
 
-username = "rup3@njit.edu"
-password = "N12345"
-con = sql.connect("database/db2.sqlite")
-cur = con.cursor()
-statement = f"SELECT email from users WHERE email='{username}' AND password = '{password}';"
-cur.execute(statement)
-if cur.fetchone():  # An empty result evaluates to False.
-    print("Login failed")
+    assert resp.status_code == 302
+
+    # verify new user is in database
+    new_user = User.query.filter_by(email=new_email).first()
+    assert new_user.email == new_email
+
+    db.session.delete(new_user) # pylint: disable=no-member
+
+def test_login(client):
+    """ POST to login """
+    data = {
+        'email' : 'testuser@test.com',
+        'password' : 'testtest'
+    }
+    resp = client.post('login', data=data)
+
+    assert resp.status_code == 302
+
+#def test_loggedIn_dash(client):
+
+
+
 
 
 
