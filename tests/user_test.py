@@ -15,9 +15,9 @@ def test_adding_user(application):
         #add it to get ready to be committed
         db.session.add(user)
         #call the commit
-        #db.session.commit()
+        db.session.commit()
         #assert that we now have a new user
-        #assert db.session.query(User).count() == 1
+        assert db.session.query(User).count() == 1
         #finding one user record by email
         user = User.query.filter_by(email='keith@webizly.com').first()
         log.info(user)
@@ -41,6 +41,17 @@ def test_adding_user(application):
         assert db.session.query(User).count() == 0
         assert db.session.query(Song).count() == 0
 
+import sqlite3 as sql
 
+username = "rup3@njit.edu"
+password = "N12345"
+con = sql.connect("database/db2.sqlite")
+cur = con.cursor()
+statement = f"SELECT email from users WHERE email='{username}' AND password = '{password}';"
+cur.execute(statement)
+if in cur.fetchone():  # An empty result evaluates to False.
+    print("Login failed")
+else:
+    print("Login Passed")
 
 
