@@ -61,17 +61,24 @@ def test_register(client):
     db.session.delete(new_user) # pylint: disable=no-member
 
 def test_login(client):
-    """ POST to login """
+    """This will test the login function"""
+    assert db.session.query(User).count() == 0
+
+    # create a new user in the database
+    user = User("newuser@test.test", "Test1234!")
+    db.session.add(user)
+    db.session.commit()
+    assert db.session.query(User).count() == 1
+    assert user.is_authenticated() is True
+    user = User.query.filter_by(email='newuser@test.test').first()
+    assert user.email == 'newuser@test.test'
+
     data = {
-        'email' : 'testuser@test.com',
-        'password' : 'testtest'
+        'email': user.email,
+        'password': user.password
     }
-    resp = client.post('login', data=data)
-
-    assert resp.status_code == 302
-
-#def test_loggedIn_dash(client):
-
+    response = client.post('/login', data=data)
+    assert response.status_code == 302
 
 
 
