@@ -49,9 +49,8 @@ con = sql.connect("database/db2.sqlite")
 cur = con.cursor()
 statement = f"SELECT email from users WHERE email='{username}' AND password = '{password}';"
 cur.execute(statement)
-if not cur.fetchone():  # An empty result evaluates to False.
+if cur.fetchone():  # An empty result evaluates to False.
     print("Login failed")
-else:
-    print("Login Passed")
+
 
 
