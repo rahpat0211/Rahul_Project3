@@ -71,17 +71,16 @@ class User(UserMixin, db.Model):
     registered_on = db.Column('registered_on', db.DateTime)
     active = db.Column('is_active', db.Boolean(), nullable=False, server_default='1')
     is_admin = db.Column('is_admin', db.Boolean(), nullable=False, server_default='0')
-    #songs = db.relationship("Song", back_populates="user", cascade="all, delete")
-    locations = db.relationship("Location",
-                    secondary=location_user, backref="users")
-    songs = db.relationship("Song",
-                    secondary=song_user, backref="users")
+    songs = db.relationship("Song", back_populates="user", cascade="all, delete")
+    #locations = db.relationship("Location", back_populates="user", cascade="all, delete")
 
-    def __init__(self, email, password, is_admin):
+    # `roles` and `groups` are reserved words that *must* be defined
+    # on the `User` model to use group- or role-based authorization.
+
+    def __init__(self, email, password):
         self.email = email
         self.password = password
         self.registered_on = datetime.utcnow()
-        self.is_admin = is_admin
 
     def is_authenticated(self):
         return True

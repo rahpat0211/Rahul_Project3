@@ -3,6 +3,7 @@
 <head>
     {% block head %}
         <!-- Required meta tags -->
+
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -13,7 +14,7 @@
 
         <title>My Site - {% block title %}{% endblock %}</title>
         <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
-
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
     {% endblock %}
 </head>
 <body>
@@ -25,14 +26,17 @@
             {% from 'bootstrap5/utils.html' import render_messages %}
             {% from 'bootstrap5/form.html' import render_form, render_field, render_form_row %}
 
-            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark"><a href="/index">
+
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+
                         data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false"
                         aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNavDropdown">
                     <div class="navbar-nav mr-auto">
+
                         {% if current_user.is_authenticated %}
                             {{ render_nav_item('auth.dashboard','Dashboard' ) }}
                         {% else %}
@@ -55,13 +59,11 @@
                                     Profile</a></li>
                                 <li><a class="dropdown-item" href="{{ url_for("auth.edit_account") }}">Manage
                                     Account</a></li>
-                                {% if current_user %}
+                                <li><a class="dropdown-item" href="{{ url_for("songs.songs_browse") }}">Song Mgmt</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for("map.browse_locations") }}">Loc Mgmt</a></li>
+                                {% if current_user.is_admin %}
                                     <li><a class="dropdown-item" href="{{ url_for("auth.browse_users") }}">User Mgmt</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for("map.browse_locations") }}">Loc Mgmt</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for("songs.songs_browse") }}">Song Mgmt</a></li>
                                     <li><a class="dropdown-item" href="{{ url_for("map.browse_locations_datatables") }}">Loc Mgmt(dt)</a></li>
-
-
                                 {% endif %}
                                 <li><a class="dropdown-item" href="{{ url_for("auth.logout") }}">Logout</a></li>
                             </ul>
@@ -78,16 +80,11 @@
     <div class="row">
         {{ render_messages() }}
     </div>
-    <div class="row mt-5">
-
+    <div class="row">
         {% block content %}
         {% endblock %}
     </div>
 </div>
-
-
-
-
 {% block scripts %}
     <!-- Optional JavaScript -->
     {{ bootstrap.load_js() }}
