@@ -37,9 +37,9 @@ def test_adding_user(application):
         song2 = Song.query.filter_by(title='SuperSongTitle').first()
         assert song2.title == "SuperSongTitle"
         #checking cascade delete
-        db.session.delete(user)
-        assert db.session.query(User).count() == 0
-        assert db.session.query(Song).count() == 0
+        #db.session.delete(user)
+        #assert db.session.query(User).count() == 0
+        #assert db.session.query(Song).count() == 0
 
 def test_register(client):
     """ POST to /register """
@@ -83,8 +83,31 @@ def test_login(client):
     # verify new user is active
     assert user.active is True
 
+#logout test
 def logout(client):
     return client.get('/logout', follow_redirects=True)
+
+#Deny Access Test
+def test_deny_access(client):
+    response = client.get("/browse_songs")
+    assert response.status_code == 404
+
+#Deny Upload Test
+def test_deny_upload(client):
+    response = client.get("/songs/upload", follow_redirects=True)
+    assert response.status_code == 200
+    assert b"Login" in response.data
+
+#Test login page
+def test_login_page(client):
+    response = client.get("/login")
+    assert response.status_code == 200
+
+#Test registration page
+def test_register_page(client):
+    response = client.get("/register")
+    assert response.status_code == 200
+
 
 
 
