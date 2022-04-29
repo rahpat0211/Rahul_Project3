@@ -83,3 +83,8 @@ input[type=submit], #submit
   margin: 4px 2px;
   cursor: pointer;
 }
+
+.table-striped>tbody>tr:nth-of-type(odd)>*
+{
+    color:white;
+}
